@@ -1,0 +1,237 @@
+[
+  {
+    "id": "khusela-assessment-2026",
+    "title": "Khusela Assessment Questionnaire 2026",
+    "description": "Please answer all questions below in full. This assessment covers workplace conduct, debt management, sales and customer service. GOOD LUCK!!!",
+    "durationMinutes": 120,
+    "startTime": "2026-05-21T14:30",
+    "dueDate": "2026-12-21",
+    "maxRetries": 0,
+    "exceptions": [],
+    "questions": [
+      {
+        "id": "kq1",
+        "type": "LONG",
+        "prompt": "1). Give two reasons it is VERY important to adhere to working hours?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq2",
+        "type": "SHORT",
+        "prompt": "2). Why is it important for a company to grant breaks and the time frame around once breaks?",
+        "maxPoints": 1
+      },
+      {
+        "id": "kq3",
+        "type": "LONG",
+        "prompt": "3). (A) Is late coming acceptable? If yes — explain why?\n\n(B) What step can a company take if late coming is a trend?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq4",
+        "type": "LONG",
+        "prompt": "4). Is there a time frame that one should report to your senior, regarding absenteeism or late coming, and why?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq5",
+        "type": "SHORT",
+        "prompt": "5). Why is dress code an important factor in any organisation?",
+        "maxPoints": 1
+      },
+      {
+        "id": "kq6",
+        "type": "LONG",
+        "prompt": "6). Is eating at your work station allowed, and why?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq7",
+        "type": "SHORT",
+        "prompt": "7). What are the consequences regarding alcohol and drug use at a work place?",
+        "maxPoints": 1
+      },
+      {
+        "id": "kq8",
+        "type": "SHORT",
+        "prompt": "8). What is your understanding regarding the term Debt Mediation?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq9",
+        "type": "LONG",
+        "prompt": "9). Give four examples of a minor account?",
+        "maxPoints": 4
+      },
+      {
+        "id": "kq10",
+        "type": "SHORT",
+        "prompt": "10). What is meant by informal process?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq11",
+        "type": "SHORT",
+        "prompt": "11). What is meant by formal process?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq12",
+        "type": "LONG",
+        "prompt": "12). List the documents required under Debt Mediation?",
+        "maxPoints": 4
+      },
+      {
+        "id": "kq13",
+        "type": "SHORT",
+        "prompt": "13). What is your understanding regarding the term Debt Review?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq14",
+        "type": "SHORT",
+        "prompt": "14). Give examples of major accounts?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq15",
+        "type": "LONG",
+        "prompt": "15). List the documents required under Debt Review?",
+        "maxPoints": 9
+      },
+      {
+        "id": "kq16",
+        "type": "SHORT",
+        "prompt": "16). In order to sign up a client, the client must be?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq17",
+        "type": "LONG",
+        "prompt": "17). List the documents required under Debt Review Removal?",
+        "maxPoints": 9
+      },
+      {
+        "id": "kq18",
+        "type": "SHORT",
+        "prompt": "18). What do you understand by the term Garnishee Order?",
+        "maxPoints": 2
+      },
+      {
+        "id": "kq19",
+        "type": "LONG",
+        "prompt": "19). List the benefits under the following:\n\nA) Debt Mediation (4 benefits)\n\nB) Debt Review (4 benefits)",
+        "maxPoints": 8
+      },
+      {
+        "id": "kq20",
+        "type": "LONG",
+        "prompt": "20). Is it important for a person to have ethics and why?",
+        "maxPoints": 4
+      },
+      {
+        "id": "kq21",
+        "type": "LONG",
+        "prompt": "21). Does image matter and why?",
+        "maxPoints": 3
+      },
+      {
+        "id": "kq22",
+        "type": "LONG",
+        "prompt": "22). List the manner in which one answers a company phone?",
+        "maxPoints": 7
+      },
+      {
+        "id": "kq23",
+        "type": "LONG",
+        "prompt": "23). Why is it important for employees to reach/achieve their daily, weekly and monthly target at all times?",
+        "maxPoints": 6
+      },
+      {
+        "id": "kq24",
+        "type": "LONG",
+        "prompt": "24). Complete the case study with calculation included:\n\nKhusela Debt Management has a sales and direct marketing department with a staff complement of 20 agents. They have a monthly target of 500 signed closed deals.\n\nPlease confirm each agent's daily, weekly and monthly target.\n\nShow your Calculation and state the Target for: Daily / Weekly / Monthly",
+        "maxPoints": 9
+      },
+      {
+        "id": "kq25",
+        "type": "LONG",
+        "prompt": "25). Give a clear understanding as to why it is important for companies to process stats monthly?",
+        "maxPoints": 4
+      },
+      {
+        "id": "kq26",
+        "type": "SHORT",
+        "prompt": "26). What is your understanding when you hear the word sales?",
+        "maxPoints": 3
+      },
+      {
+        "id": "kq27",
+        "type": "LONG",
+        "prompt": "27). Explain in your own words why clients/customers stay or leave a company?\n\nA) Why clients/customers STAY (3)\n\nB) Why clients/customers LEAVE (3)",
+        "maxPoints": 6
+      },
+      {
+        "id": "kq28",
+        "type": "LONG",
+        "prompt": "28). List the four objective handling strategies?",
+        "maxPoints": 4
+      }
+    ]
+  },
+  {
+    "id": "m4-assessment",
+    "title": "Module 4: Example assessment",
+    "description": "This assessment covers the core concepts of Module 4.",
+    "durationMinutes": 60,
+    "startTime": "2026-05-20T09:00:00.000Z",
+    "dueDate": "2026-06-01T00:00:00.000Z",
+    "maxRetries": 2,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "MCQ",
+        "prompt": "What is the capital of France?",
+        "options": [
+          "London",
+          "Berlin",
+          "Paris",
+          "Madrid"
+        ],
+        "correctOptionIndex": 2,
+        "maxPoints": 5
+      },
+      {
+        "id": "q2",
+        "type": "SHORT",
+        "prompt": "Explain the concept of photosynthesis in one sentence.",
+        "maxPoints": 10
+      },
+      {
+        "id": "q3",
+        "type": "LONG",
+        "prompt": "Discuss the impact of the Industrial Revolution on modern society.",
+        "maxPoints": 20
+      }
+    ],
+    "exceptions": []
+  },
+  {
+    "title": "Module 1",
+    "description": "Example",
+    "durationMinutes": 180,
+    "startTime": "2026-05-21T07:00",
+    "dueDate": "2026-05-22",
+    "maxRetries": 1,
+    "questions": [
+      {
+        "id": "1779345296345",
+        "type": "LONG",
+        "prompt": "How many matchas do you consume in a day",
+        "maxPoints": 5
+      }
+    ],
+    "exceptions": [],
+    "id": "1779345328857"
+  }
+]
