@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Award, Shield, Users } from 'lucide-react';
-
-const features = [
-  { icon: <Users size={20} />,  text: 'Community Enrichment' },
-  { icon: <Clock size={20} />,  text: 'Timed assessments' },
-  { icon: <Award size={20} />,  text: 'Instant results & feedback' },
-  { icon: <Shield size={20} />, text: 'Secure & tamper-proof' },
-];
 
 // ─── South African ID validator ───────────────────────────────────────────────
 // Validates: 13 digits, valid YYMMDD birth date, citizenship digit 0 or 1,
@@ -140,17 +132,9 @@ const LandingPage: React.FC = () => {
               Online Assessment<br />
               <span style={{ color: 'var(--primary)' }}>Made Simple</span>
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '16px', margin: '0 0 32px', lineHeight: 1.6 }}>
-              A streamlined platform for students to take timed exams and receive instant, detailed feedback.
+            <p style={{ color: 'var(--text-muted)', fontSize: '16px', margin: 0, lineHeight: 1.6 }}>
+              Enter your details below to access your assessments.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', maxWidth: '380px', margin: '0 auto' }}>
-              {features.map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', background: 'rgba(255,255,255,0.7)', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.07)', fontSize: '13px', fontWeight: 600, color: '#374151', backdropFilter: 'blur(4px)' }}>
-                  <span style={{ color: 'var(--primary)', flexShrink: 0 }}>{f.icon}</span>
-                  {f.text}
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Form side */}
