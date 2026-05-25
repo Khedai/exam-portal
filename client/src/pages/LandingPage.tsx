@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Clock, Award, Shield } from 'lucide-react';
 
@@ -54,7 +54,20 @@ const LandingPage: React.FC = () => {
     name: '', surname: '', cellNumber: '', studentId: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [savedInfo, setSavedInfo] = useState(false);
   const navigate = useNavigate();
+
+  // Pre-fill from localStorage if returning student
+  useEffect(() => {
+    const saved = localStorage.getItem('studentInfo');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setFormData(parsed);
+        setSavedInfo(true);
+      } catch {}
+    }
+  }, []);
 
   const set = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -89,6 +102,8 @@ const LandingPage: React.FC = () => {
       return;
     }
 
+    // Persist to localStorage for future pre-fills, and sessionStorage for this session
+    localStorage.setItem('studentInfo', JSON.stringify(formData));
     sessionStorage.setItem('studentInfo', JSON.stringify(formData));
     navigate('/dashboard');
   };
@@ -142,7 +157,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Form side */}
-          <div className="card" style={{ padding: '36px', boxShadow: '0 12px 40px rgba(0,0,0,0.12)', borderRadius: 16 }}>
+          <div className="card landing-form-card" style={{ padding: '36px', boxShadow: '0 12px 40px rgba(0,0,0,0.12)', borderRadius: 16 }}>
             <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px' }}>Student Sign In</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 24px' }}>
               Enter your details to access your assessments.
@@ -150,7 +165,7 @@ const LandingPage: React.FC = () => {
 
             <form onSubmit={handleSubmit}>
               {/* Name row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="name-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <Field label="First Name" error={errors.name}>
                   <input type="text" required value={formData.name} placeholder="Anita"
                     style={errors.name ? errStyle : {}}
@@ -197,7 +212,24 @@ const LandingPage: React.FC = () => {
                 )}
               </Field>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '15px', marginTop: '8px', borderRadius: '10px' }}>
+              {savedInfo && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--primary-light)', border: '1px solid #a7f3d0', borderRadius: '8px', padding: '10px 14px', marginBottom: '12px', fontSize: '13px' }}>
+                  <span style={{ color: '#065f46', fontWeight: 600 }}>✓ Details remembered from last session</span>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', color: '#065f46', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textDecoration: 'underline', padding: 0 }}
+                    onClick={() => {
+                      localStorage.removeItem('studentInfo');
+                      setFormData({ name: '', surname: '', cellNumber: '', studentId: '' });
+                      setSavedInfo(false);
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '15px', marginTop: '4px', borderRadius: '10px' }}>
                 Access My Exams
               </button>
             </form>

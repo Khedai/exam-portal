@@ -141,7 +141,7 @@ const TeacherDashboard: React.FC = () => {
         )}
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border)' }}>
+        <div className="tab-bar" style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border)' }}>
           <button className={`tab-btn ${activeTab === 'submissions' ? 'active' : ''}`} onClick={() => setActiveTab('submissions')}>
             Submissions
             {ungradedCount > 0 && (

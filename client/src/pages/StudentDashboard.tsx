@@ -26,9 +26,12 @@ const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const info = sessionStorage.getItem('studentInfo');
-    if (!info) { navigate('/'); return; }
-    setStudentInfo(JSON.parse(info));
+    const raw = sessionStorage.getItem('studentInfo') || localStorage.getItem('studentInfo');
+    if (!raw) { navigate('/'); return; }
+    const info = JSON.parse(raw);
+    // Ensure sessionStorage is populated for ExamView
+    sessionStorage.setItem('studentInfo', raw);
+    setStudentInfo(info);
 
     const fetchData = async () => {
       try {
