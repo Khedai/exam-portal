@@ -106,7 +106,8 @@ const CreateExam: React.FC = () => {
         <button className="btn btn-secondary" style={{ fontSize: '13px' }} onClick={() => navigate('/teacher')}>
           <ChevronLeft size={16} /> Back
         </button>
-        <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--text)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 800, fontSize: '16px', color: 'var(--text)' }}>
+          <img src="/logo.png" alt="Khusela" style={{ height: '32px', objectFit: 'contain' }} />
           {isEdit ? 'Edit Assessment' : 'Create Assessment'}
           {totalPoints > 0 && (
             <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', marginLeft: '12px' }}>

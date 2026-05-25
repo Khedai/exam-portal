@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import type { Submission, Exam } from '../types.ts';
-import { PlusCircle, Search, LogOut, LayoutDashboard, ChevronRight, BookOpen, Users, ClipboardCheck, Clock } from 'lucide-react';
+import { PlusCircle, Search, LogOut, ChevronRight, BookOpen, Users, ClipboardCheck, Clock } from 'lucide-react';
 import ToastContainer, { useToast } from '../components/Toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -73,8 +73,8 @@ const TeacherDashboard: React.FC = () => {
 
       <nav className="navbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <LayoutDashboard size={22} color="var(--primary)" />
-          <h1>Teacher Admin</h1>
+          <img src="/logo.png" alt="Khusela" style={{ height: '40px', objectFit: 'contain' }} />
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)', borderLeft: '1px solid var(--border)', paddingLeft: '10px' }}>Admin</span>
         </div>
         <button className="btn btn-secondary" style={{ fontSize: '13px' }} onClick={() => {
           sessionStorage.removeItem('isTeacher');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, BookOpen, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 const TeacherLogin: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -39,15 +39,13 @@ const TeacherLogin: React.FC = () => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{
-            width: 72, height: 72, borderRadius: 18,
-            background: 'rgba(255,255,255,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.25)',
+            display: 'inline-flex', padding: '16px 24px', borderRadius: 18,
+            background: 'rgba(255,255,255,0.95)',
+            margin: '0 auto 16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
           }}>
-            <BookOpen size={36} color="white" />
+            <img src="/logo.png" alt="Khusela Community Enrichment" style={{ height: '60px', objectFit: 'contain' }} />
           </div>
-          <h1 style={{ color: 'white', margin: '0 0 6px', fontWeight: 900, fontSize: '26px' }}>ExamPortal</h1>
           <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: '14px' }}>Teacher Administration Portal</p>
         </div>
 

@@ -171,8 +171,9 @@ const ExamView: React.FC = () => {
       )}
 
       <nav className="navbar">
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>{exam.title}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+          <img src="/logo.png" alt="Khusela" style={{ height: '36px', objectFit: 'contain', flexShrink: 0 }} />
+          <h1 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '260px', fontSize: '15px' }}>{exam.title}</h1>
         </div>
         {/* Progress */}
         <div style={{ flex: 1, maxWidth: '200px', margin: '0 16px', display: 'none' }} className="nav-progress">

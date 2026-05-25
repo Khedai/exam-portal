@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Clock, Award, Shield } from 'lucide-react';
+import { Clock, Award, Shield, Users } from 'lucide-react';
 
 const features = [
-  { icon: <BookOpen size={20} />, text: 'Multiple question types' },
-  { icon: <Clock size={20} />,    text: 'Timed assessments' },
-  { icon: <Award size={20} />,    text: 'Instant results & feedback' },
-  { icon: <Shield size={20} />,   text: 'Secure & tamper-proof' },
+  { icon: <Users size={20} />,  text: 'Community Enrichment' },
+  { icon: <Clock size={20} />,  text: 'Timed assessments' },
+  { icon: <Award size={20} />,  text: 'Instant results & feedback' },
+  { icon: <Shield size={20} />, text: 'Secure & tamper-proof' },
 ];
 
 // ─── South African ID validator ───────────────────────────────────────────────
@@ -119,11 +119,8 @@ const LandingPage: React.FC = () => {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #e8f5e9 0%, #e3f2fd 100%)', display: 'flex', flexDirection: 'column' }}>
       {/* Navbar */}
       <nav className="navbar" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={18} color="white" />
-          </div>
-          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: 'var(--primary)' }}>ExamPortal</h1>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/logo.png" alt="Khusela Community Enrichment" style={{ height: '44px', objectFit: 'contain' }} />
         </div>
         <button className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }} onClick={() => navigate('/teacher/login')}>
           Teacher Login
@@ -136,8 +133,8 @@ const LandingPage: React.FC = () => {
 
           {/* Branding side */}
           <div style={{ textAlign: 'center' }}>
-            <div style={{ width: 80, height: 80, borderRadius: 20, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 24px rgba(4,170,109,0.3)' }}>
-              <BookOpen size={40} color="white" />
+            <div style={{ margin: '0 auto 24px' }}>
+              <img src="/logo.png" alt="Khusela Community Enrichment" style={{ height: '90px', objectFit: 'contain' }} />
             </div>
             <h1 style={{ fontSize: '36px', fontWeight: 900, margin: '0 0 12px', lineHeight: 1.2, color: '#111' }}>
               Online Assessment<br />

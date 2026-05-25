@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import type { Exam, Submission } from '../types.ts';
-import { BookOpen, LogOut, Clock, ChevronRight } from 'lucide-react';
+import { LogOut, Clock, ChevronRight } from 'lucide-react';
 
 const SkeletonCard = () => (
   <div className="card" style={{ padding: '20px' }}>
@@ -134,9 +134,8 @@ const StudentDashboard: React.FC = () => {
   return (
     <div className="app-container">
       <nav className="navbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <BookOpen size={22} color="var(--primary)" />
-          <h1>ExamPortal</h1>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/logo.png" alt="Khusela" style={{ height: '40px', objectFit: 'contain' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ textAlign: 'right', display: 'none' }} className="student-name-desktop">
@@ -192,7 +191,7 @@ const StudentDashboard: React.FC = () => {
           </div>
         ) : exams.length === 0 ? (
           <div className="card empty-state">
-            <div className="empty-state-icon"><BookOpen size={28} color="var(--text-muted)" /></div>
+            <div className="empty-state-icon"><img src="/logo.png" alt="" style={{ width: 36, height: 36, objectFit: 'contain', opacity: 0.4 }} /></div>
             <h3 style={{ margin: 0, fontWeight: 700 }}>No Assessments Yet</h3>
             <p style={{ margin: 0, fontSize: '14px' }}>Your teacher hasn't posted any exams yet. Check back later.</p>
           </div>
