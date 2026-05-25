@@ -11,7 +11,7 @@ const ExamView: React.FC = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
   // endTime stored as ms timestamp so polling can update it when teacher extends
   const [endTime, setEndTime] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -42,6 +42,9 @@ const ExamView: React.FC = () => {
   // ── Initial load & validation ────────────────────────
   useEffect(() => {
     if (!examId || !submissionId) return;
+    setInitialized(false);
+    setTimeLeft(null);
+    setEndTime(0);
     const studentInfo = JSON.parse(sessionStorage.getItem('studentInfo') || '{}');
 
     Promise.all([api.getExam(examId), api.getSubmissions()]).then(([examData, subsData]) => {
@@ -91,21 +94,20 @@ const ExamView: React.FC = () => {
     return () => clearInterval(id);
   }, [examId, initialized]);
 
-  // ── Countdown: derive timeLeft from endTime every second ─────
+  // ── Countdown + auto-submit only when wall-clock time has expired ─
   useEffect(() => {
-    if (!endTime) return;
-    const tick = () => setTimeLeft(Math.max(0, Math.floor((endTime - Date.now()) / 1000)));
-    tick(); // immediate so display doesn't lag by 1 s
+    if (!endTime || !initialized) return;
+    const tick = () => {
+      const left = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      setTimeLeft(left);
+      if (left === 0 && Date.now() >= endTime && exam && !isSubmitting) {
+        submitExam();
+      }
+    };
+    tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [endTime]);
-
-  // ── Auto-submit when time runs out ───────────────────────────
-  useEffect(() => {
-    if (initialized && timeLeft === 0 && exam && !isSubmitting) {
-      submitExam();
-    }
-  }, [initialized, timeLeft, exam, isSubmitting, submitExam]);
+  }, [endTime, initialized, exam, isSubmitting, submitExam]);
 
   // ── Auto-save answers to localStorage every 30 s ─────────────
   useEffect(() => {
@@ -151,7 +153,8 @@ const ExamView: React.FC = () => {
   );
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
-  const timerClass = timeLeft < 60 ? 'timer-danger' : timeLeft < 300 ? 'timer-warning' : '';
+  const displayTime = timeLeft ?? 0;
+  const timerClass = displayTime < 60 ? 'timer-danger' : displayTime < 300 ? 'timer-warning' : '';
   const q = exam.questions[currentQuestion];
   const currentAnswer = answers.find(a => a.questionId === q.id);
   const progressPct = (answeredCount / exam.questions.length) * 100;
@@ -186,7 +189,7 @@ const ExamView: React.FC = () => {
         </div>
         <div className={`timer-container ${timerClass}`}>
           <Clock size={18} />
-          <span>{formatTime(timeLeft)}</span>
+          <span>{timeLeft === null ? '--:--' : formatTime(displayTime)}</span>
         </div>
       </nav>
 
