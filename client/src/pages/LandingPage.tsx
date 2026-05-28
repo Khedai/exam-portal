@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 // ─── South African ID validator ───────────────────────────────────────────────
 // Validates: 13 digits, valid YYMMDD birth date, citizenship digit 0 or 1,
@@ -47,9 +48,11 @@ const LandingPage: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [savedInfo, setSavedInfo] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
 
-  // Pre-fill from localStorage if returning student
+  // Check if student already logged in on this browser
   useEffect(() => {
     const saved = localStorage.getItem('studentInfo');
     if (saved) {
@@ -59,7 +62,13 @@ const LandingPage: React.FC = () => {
         setSavedInfo(true);
       } catch {}
     }
-  }, []);
+
+    // If already authenticated in this session, skip to dashboard
+    const sessionAuth = sessionStorage.getItem('student-login-success');
+    if (sessionAuth === 'true') {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const set = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -76,8 +85,9 @@ const LandingPage: React.FC = () => {
     set('cellNumber', value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError('');
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim())    newErrors.name    = 'First name is required.';
@@ -94,10 +104,28 @@ const LandingPage: React.FC = () => {
       return;
     }
 
-    // Persist to localStorage for future pre-fills, and sessionStorage for this session
-    localStorage.setItem('studentInfo', JSON.stringify(formData));
-    sessionStorage.setItem('studentInfo', JSON.stringify(formData));
-    navigate('/dashboard');
+    setIsLoggingIn(true);
+
+    try {
+      // ─── Server-side once-off login check ──────────────────────────
+      // This call will REJECT if the student has already logged in on any device
+      await api.studentLogin({
+        studentId: formData.studentId,
+        name: formData.name,
+        surname: formData.surname,
+        cellNumber: formData.cellNumber
+      });
+
+      // Persist to localStorage for future pre-fills, and sessionStorage for this session
+      localStorage.setItem('studentInfo', JSON.stringify(formData));
+      sessionStorage.setItem('studentInfo', JSON.stringify(formData));
+      // Mark this browser session as authenticated (prevents re-login on this tab)
+      sessionStorage.setItem('student-login-success', 'true');
+      navigate('/dashboard');
+    } catch (err: any) {
+      setLoginError(err.message || 'Login failed. Please try again.');
+      setIsLoggingIn(false);
+    }
   };
 
   const idStatus = (() => {
@@ -134,6 +162,7 @@ const LandingPage: React.FC = () => {
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '16px', margin: 0, lineHeight: 1.6 }}>
               Enter your details below to access your assessments.
+              <br /><strong style={{ color: '#dc2626', fontSize: '13px' }}>⚠ Only one login attempt is allowed per student.</strong>
             </p>
           </div>
 
@@ -142,7 +171,18 @@ const LandingPage: React.FC = () => {
             <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px' }}>Student Sign In</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 24px' }}>
               Enter your details to access your assessments.
+              <br /><strong style={{ fontSize: '12px', color: '#dc2626' }}>You may only sign in once. Do not close the tab or refresh unnecessarily.</strong>
             </p>
+
+            {loginError && (
+              <div style={{
+                background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px',
+                padding: '12px 16px', marginBottom: '20px', color: '#991b1b',
+                fontSize: '13px', fontWeight: 600, lineHeight: 1.5
+              }}>
+                {loginError}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               {/* Name row */}
@@ -210,8 +250,13 @@ const LandingPage: React.FC = () => {
                 </div>
               )}
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '15px', marginTop: '4px', borderRadius: '10px' }}>
-                Access My Exams
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '14px', fontSize: '15px', marginTop: '4px', borderRadius: '10px' }}
+                disabled={isLoggingIn}
+              >
+                {isLoggingIn ? 'Verifying...' : 'Access My Exams'}
               </button>
             </form>
 

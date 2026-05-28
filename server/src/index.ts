@@ -18,6 +18,15 @@ app.use(express.json());
 // In dev (ts-node-dev), __dirname is src/ so data is at src/data/*.json
 const EXAMS_FILE = path.join(__dirname, 'data', 'exams.json');
 const SUBMISSIONS_FILE = path.join(__dirname, 'data', 'submissions.json');
+const STUDENT_SESSIONS_FILE = path.join(__dirname, 'data', 'student-sessions.json');
+
+// Student session tracking for once-off login enforcement
+interface StudentSession {
+  studentId: string;
+  studentName: string;
+  loginTime: string;
+  ipAddress?: string;
+}
 
 // Ensure data directory + files exist (first deploy on a fresh server)
 const ensureDataFiles = () => {
@@ -25,6 +34,7 @@ const ensureDataFiles = () => {
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   if (!fs.existsSync(EXAMS_FILE)) fs.writeFileSync(EXAMS_FILE, '[]');
   if (!fs.existsSync(SUBMISSIONS_FILE)) fs.writeFileSync(SUBMISSIONS_FILE, '[]');
+  if (!fs.existsSync(STUDENT_SESSIONS_FILE)) fs.writeFileSync(STUDENT_SESSIONS_FILE, '[]');
 };
 ensureDataFiles();
 
@@ -37,7 +47,67 @@ const writeData = <T>(filePath: string, data: T): void => {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 };
 
-// ─── API Routes ──────────────────────────────────────────────────────────────
+// ─── Once-off Student Login ───────────────────────────────────────────────────
+
+app.post('/api/auth/student-login', (req, res) => {
+  const { studentId, name, surname, cellNumber } = req.body;
+
+  if (!studentId || !name) {
+    return res.status(400).json({ message: 'Student ID and name are required.' });
+  }
+
+  const sessions = readData<StudentSession[]>(STUDENT_SESSIONS_FILE);
+
+  // Check if this student has already logged in (once-off enforcement)
+  const existingSession = sessions.find(s => s.studentId === studentId);
+  if (existingSession) {
+    return res.status(403).json({
+      message: 'You have already logged in from another device or browser. ' +
+        'For security reasons, each student may only log in once. ' +
+        'If you believe this is an error, please contact your teacher.'
+    });
+  }
+
+  // Record this login session
+  const newSession: StudentSession = {
+    studentId,
+    studentName: `${name} ${surname}`,
+    loginTime: new Date().toISOString(),
+    ipAddress: req.ip || req.socket.remoteAddress
+  };
+  sessions.push(newSession);
+  writeData(STUDENT_SESSIONS_FILE, sessions);
+
+  res.status(200).json({ success: true, message: 'Login recorded successfully.' });
+});
+
+// ─── Teacher: Reset a student's login session (for legitimate cases) ──────────
+app.post('/api/auth/reset-student-login', (req, res) => {
+  const { studentId, teacherToken } = req.body;
+
+  // Simple teacher authorization (in production, use proper auth)
+  if (!teacherToken || teacherToken !== process.env.TEACHER_SECRET) {
+    return res.status(401).json({ message: 'Unauthorized. Teacher token required.' });
+  }
+
+  const sessions = readData<StudentSession[]>(STUDENT_SESSIONS_FILE);
+  const filtered = sessions.filter(s => s.studentId !== studentId);
+
+  if (filtered.length < sessions.length) {
+    writeData(STUDENT_SESSIONS_FILE, filtered);
+    res.json({ success: true, message: `Login session reset for student ${studentId}.` });
+  } else {
+    res.json({ success: true, message: 'No active session found for that student.' });
+  }
+});
+
+// ─── Teacher: Get all student sessions ────────────────────────────────────────
+app.get('/api/auth/student-sessions', (req, res) => {
+  const sessions = readData<StudentSession[]>(STUDENT_SESSIONS_FILE);
+  res.json(sessions);
+});
+
+// ─── Exam & Submission Routes ─────────────────────────────────────────────────
 
 app.get('/api/exams', (req, res) => {
   const exams = readData<Exam[]>(EXAMS_FILE);
@@ -110,7 +180,30 @@ app.get('/api/submissions', (req, res) => {
 });
 
 app.post('/api/submissions', (req, res) => {
+  const { examId, student } = req.body;
+
+  if (!examId || !student || !student.id) {
+    return res.status(400).json({ message: 'examId and student details are required.' });
+  }
+
   const submissions = readData<Submission[]>(SUBMISSIONS_FILE);
+
+  // ─── Enforce: ONE submission per student per exam (no retries) ──────────────
+  const existingSubmission = submissions.find(
+    s => s.examId === examId && s.student.id === student.id
+  );
+
+  if (existingSubmission) {
+    // If they have an in-progress submission, return it so they can continue
+    if (existingSubmission.status === 'STARTED') {
+      return res.status(200).json(existingSubmission);
+    }
+    // If they've already submitted or been marked, reject
+    return res.status(403).json({
+      message: 'You have already submitted this assessment. Only one attempt is allowed.'
+    });
+  }
+
   const newSubmission: Submission = {
     ...req.body,
     id: Date.now().toString(),

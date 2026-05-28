@@ -3,6 +3,18 @@ import type { Exam, Submission } from '../types.ts';
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const api = {
+  // ─── Once-off student login ───────────────────────────────
+  async studentLogin(info: { studentId: string; name: string; surname: string; cellNumber: string }): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/auth/student-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(info)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+    return data;
+  },
+
   async getExams(): Promise<Exam[]> {
     const res = await fetch(`${API_BASE}/exams`);
     return res.json();

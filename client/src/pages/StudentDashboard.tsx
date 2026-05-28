@@ -52,15 +52,24 @@ const StudentDashboard: React.FC = () => {
 
   const handleStartExam = async (exam: Exam) => {
     if (!studentInfo) return;
-    const studentSubs = submissions.filter(s => s.examId === exam.id && s.student.id === studentInfo.studentId);
-    const inProgress = studentSubs.find(s => s.status === 'STARTED');
-    if (inProgress) { navigate(`/exam/${exam.id}/${inProgress.id}`); return; }
 
-    const submittedCount = studentSubs.filter(s => s.status === 'SUBMITTED' || s.status === 'MARKED').length;
-    if (submittedCount > (exam.maxRetries || 0)) {
-      alert('You have reached the maximum number of retries for this exam.');
+    const existingSub = submissions.find(
+      s => s.examId === exam.id && s.student.id === studentInfo.studentId
+    );
+
+    // If they already have an in-progress submission, continue it
+    if (existingSub && existingSub.status === 'STARTED') {
+      navigate(`/exam/${exam.id}/${existingSub.id}`);
       return;
     }
+
+    // If they already submitted, show results instead
+    if (existingSub && (existingSub.status === 'SUBMITTED' || existingSub.status === 'MARKED')) {
+      navigate(`/results/${existingSub.id}`);
+      return;
+    }
+
+    // Only one attempt allowed — create new submission
     try {
       const submission = await api.createSubmission({
         examId: exam.id,
@@ -71,9 +80,10 @@ const StudentDashboard: React.FC = () => {
           cellNumber: studentInfo.cellNumber
         }
       });
+      // If server returned an existing STARTED submission (duplicate check), use it
       navigate(`/exam/${exam.id}/${submission.id}`);
-    } catch (err) {
-      console.error('Failed to start exam', err);
+    } catch (err: any) {
+      alert(err.message || 'Failed to start exam. You may have already submitted this assessment.');
     }
   };
 
@@ -87,12 +97,20 @@ const StudentDashboard: React.FC = () => {
       isLocked: true, variant: 'locked' as const
     };
 
-    const studentSubs = submissions.filter(s => s.examId === exam.id && s.student.id === studentInfo?.studentId);
-    const hasSubmitted = studentSubs.some(s => s.status === 'SUBMITTED' || s.status === 'MARKED');
-    const hasStarted = studentSubs.some(s => s.status === 'STARTED');
+    const studentSub = submissions.find(
+      s => s.examId === exam.id && s.student.id === studentInfo?.studentId
+    );
+
+    const hasSubmitted = studentSub && (studentSub.status === 'SUBMITTED' || studentSub.status === 'MARKED');
+    const hasStarted = studentSub && studentSub.status === 'STARTED';
+
+    // Already submitted — show as completed
+    if (hasSubmitted) {
+      return { label: studentSub!.status === 'MARKED' ? 'Graded' : 'Submitted', isLocked: true, variant: 'submitted' as const };
+    }
 
     if (now >= startTime && now < endTime) {
-      if (!hasStarted && !hasSubmitted) {
+      if (!hasStarted) {
         const diff = endTime.getTime() - now.getTime();
         const mins = Math.floor(diff / 60000);
         const secs = Math.floor((diff % 60000) / 1000);
@@ -125,10 +143,19 @@ const StudentDashboard: React.FC = () => {
     open:       { borderLeft: '4px solid var(--primary)' },
     urgent:     { borderLeft: '4px solid #ef4444' },
     inprogress: { borderLeft: '4px solid var(--secondary)' },
+    submitted:  { borderLeft: '4px solid #8b5cf6', opacity: 0.85 },
   };
 
   const variantBadge: Record<string, string> = {
-    locked: 'badge-neutral', open: 'badge-success', urgent: 'badge-danger', inprogress: 'badge-info',
+    locked: 'badge-neutral', open: 'badge-success', urgent: 'badge-danger', inprogress: 'badge-info', submitted: 'badge-purple',
+  };
+
+  const variantButtonText: Record<string, string> = {
+    locked: 'Locked',
+    open: 'Start Assessment',
+    urgent: 'Start Assessment',
+    inprogress: 'Continue Assessment',
+    submitted: 'View Results',
   };
 
   return (
@@ -145,20 +172,41 @@ const StudentDashboard: React.FC = () => {
               {studentInfo.cellNumber && <> &bull; {studentInfo.cellNumber}</>}
             </div>
           </div>
-          <button className="btn btn-secondary" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => navigate('/')}>
-            <LogOut size={15} /> Logout
+          <button
+            className="btn btn-secondary"
+            style={{ padding: '8px 14px', fontSize: '13px' }}
+            onClick={() => {
+              sessionStorage.clear();
+              navigate('/');
+            }}
+          >
+            <LogOut size={15} /> Exit
           </button>
         </div>
       </nav>
 
       <div className="container">
+        {/* Warning banner — single login notice */}
+        <div style={{
+          background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px',
+          padding: '12px 18px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px'
+        }}>
+          <span style={{ fontSize: '20px' }}>⚠️</span>
+          <div>
+            <strong style={{ fontSize: '13px', color: '#9a3412' }}>One Login Only</strong>
+            <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#a16207' }}>
+              Do not close this browser tab or navigate away until you've submitted your assessments. You cannot log in again.
+            </p>
+          </div>
+        </div>
+
         {/* Greeting */}
         <div style={{ marginBottom: '24px' }}>
           <h2 style={{ margin: '0 0 4px', fontSize: '26px', fontWeight: 900 }}>
             Welcome back, {studentInfo.name}
           </h2>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '14px' }}>
-            Here are your available assessments.
+            Here are your available assessments. <strong>Each assessment allows only one attempt.</strong>
           </p>
         </div>
 
@@ -199,10 +247,9 @@ const StudentDashboard: React.FC = () => {
           <div className="exam-grid">
             {exams.map(exam => {
               const status = getExamStatus(exam);
-              const studentSubs = submissions.filter(s => s.examId === exam.id && s.student.id === studentInfo.studentId);
-              const submittedCount = studentSubs.filter(s => s.status === 'SUBMITTED' || s.status === 'MARKED').length;
-              const hasStarted = studentSubs.some(s => s.status === 'STARTED');
-              const maxAttempts = (exam.maxRetries || 0) + 1;
+              const studentSub = submissions.find(
+                s => s.examId === exam.id && s.student.id === studentInfo.studentId
+              );
 
               return (
                 <div
@@ -217,7 +264,11 @@ const StudentDashboard: React.FC = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                       <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, flex: 1 }}>{exam.title}</h3>
                       <span className={`badge ${variantBadge[status.variant]}`} style={{ marginLeft: '10px', flexShrink: 0 }}>
-                        {status.variant === 'locked' ? 'Locked' : status.variant === 'urgent' ? 'Urgent' : status.variant === 'inprogress' ? 'Active' : 'Open'}
+                        {status.variant === 'locked' ? 'Locked'
+                          : status.variant === 'urgent' ? 'Urgent'
+                          : status.variant === 'inprogress' ? 'Active'
+                          : status.variant === 'submitted' ? (studentSub?.status === 'MARKED' ? 'Graded' : 'Done')
+                          : 'Open'}
                       </span>
                     </div>
 
@@ -230,67 +281,56 @@ const StudentDashboard: React.FC = () => {
                         <Clock size={13} />
                         <span>{exam.durationMinutes} min &bull; {exam.questions?.length || 0} questions</span>
                       </div>
-                      <div style={{ fontWeight: 700, color: status.variant === 'urgent' ? '#ef4444' : status.variant === 'locked' ? 'var(--text-muted)' : 'var(--primary)', fontSize: '13px' }}>
+                      <div style={{
+                        fontWeight: 700,
+                        color: status.variant === 'urgent' ? '#ef4444'
+                          : status.variant === 'locked' ? 'var(--text-muted)'
+                          : status.variant === 'submitted' ? '#8b5cf6'
+                          : 'var(--primary)',
+                        fontSize: '13px'
+                      }}>
                         {status.label}
                       </div>
-                    </div>
-
-                    {/* Attempts progress */}
-                    <div style={{ marginTop: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>
-                        <span>Attempts</span>
-                        <span>{submittedCount} / {maxAttempts}</span>
-                      </div>
-                      <div className="progress-bar-wrap">
-                        <div
-                          className="progress-bar-fill"
-                          style={{ width: `${(submittedCount / maxAttempts) * 100}%`, background: submittedCount >= maxAttempts ? '#ef4444' : 'var(--primary)' }}
-                        />
+                      {/* Single attempt note */}
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                        {studentSub ? 'Attempt completed' : '1 attempt remaining'}
                       </div>
                     </div>
 
-                    {/* Past attempts */}
-                    {studentSubs.length > 0 && (
+                    {/* Past attempt info */}
+                    {studentSub && (
                       <div style={{ marginTop: '16px', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
                         <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
-                          Past Attempts
+                          Your Attempt
                         </div>
-                        <div style={{ display: 'grid', gap: '6px' }}>
-                          {studentSubs.map((sub, sIdx) => (
-                            <div key={sub.id} className="attempt-row">
-                              <span style={{ fontWeight: 600 }}>Attempt #{sIdx + 1}</span>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className={`badge ${sub.status === 'MARKED' ? 'badge-success' : sub.status === 'STARTED' ? 'badge-info' : 'badge-warning'}`}>
-                                  {sub.status}
-                                </span>
-                                {sub.status === 'MARKED' && (
-                                  <button
-                                    className="btn btn-secondary"
-                                    style={{ padding: '3px 10px', fontSize: '12px' }}
-                                    onClick={() => navigate(`/results/${sub.id}`)}
-                                  >
-                                    View <ChevronRight size={12} />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          ))}
+                        <div className="attempt-row">
+                          <span style={{ fontWeight: 600 }}>Attempt #1</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className={`badge ${studentSub.status === 'MARKED' ? 'badge-success' : studentSub.status === 'STARTED' ? 'badge-info' : 'badge-warning'}`}>
+                              {studentSub.status}
+                            </span>
+                            {studentSub.status === 'MARKED' && (
+                              <button
+                                className="btn btn-secondary"
+                                style={{ padding: '3px 10px', fontSize: '12px' }}
+                                onClick={() => navigate(`/results/${studentSub.id}`)}
+                              >
+                                View <ChevronRight size={12} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
                   </div>
 
                   <button
-                    className={`btn ${status.isLocked || submittedCount >= maxAttempts ? 'btn-secondary' : 'btn-primary'}`}
+                    className={`btn ${status.isLocked && status.variant !== 'submitted' ? 'btn-secondary' : 'btn-primary'}`}
                     style={{ borderRadius: '0', padding: '14px', fontSize: '14px', width: '100%' }}
                     onClick={() => handleStartExam(exam)}
-                    disabled={status.isLocked || submittedCount >= maxAttempts}
+                    disabled={status.isLocked && status.variant !== 'submitted'}
                   >
-                    {status.isLocked ? 'Locked'
-                      : hasStarted ? 'Continue Assessment'
-                      : submittedCount >= maxAttempts ? 'No Retries Left'
-                      : submittedCount > 0 ? 'Retry Assessment'
-                      : 'Start Assessment'}
+                    {variantButtonText[status.variant] || 'Start Assessment'}
                   </button>
                 </div>
               );

@@ -12,25 +12,25 @@
       {
         "id": "kq1",
         "type": "LONG",
-        "prompt": "1). Give two reasons it is VERY important to adhere to working hours?",
+        "prompt": "1). Give two reasons why it is VERY important to adhere to working hours?",
         "maxPoints": 2
       },
       {
         "id": "kq2",
         "type": "SHORT",
-        "prompt": "2). Why is it important for a company to grant breaks and the time frame around once breaks?",
+        "prompt": "2). Why is it important for a company to grant breaks and what is the time frame around such breaks?",
         "maxPoints": 1
       },
       {
         "id": "kq3",
         "type": "LONG",
-        "prompt": "3). (A) Is late coming acceptable? If yes — explain why?\n\n(B) What step can a company take if late coming is a trend?",
+        "prompt": "3). (A) Is late coming acceptable? If yes — explain why?\n\n(B) What steps can a company take if late coming becomes a trend?",
         "maxPoints": 2
       },
       {
         "id": "kq4",
         "type": "LONG",
-        "prompt": "4). Is there a time frame that one should report to your senior, regarding absenteeism or late coming, and why?",
+        "prompt": "4). Is there a time frame within which one should report absenteeism or late coming to your senior, and why?",
         "maxPoints": 2
       },
       {
@@ -42,13 +42,13 @@
       {
         "id": "kq6",
         "type": "LONG",
-        "prompt": "6). Is eating at your work station allowed, and why?",
+        "prompt": "6). Is eating at your workstation allowed, and why?",
         "maxPoints": 2
       },
       {
         "id": "kq7",
         "type": "SHORT",
-        "prompt": "7). What are the consequences regarding alcohol and drug use at a work place?",
+        "prompt": "7). What are the consequences regarding alcohol and drug use in the workplace?",
         "maxPoints": 1
       },
       {
@@ -60,19 +60,19 @@
       {
         "id": "kq9",
         "type": "LONG",
-        "prompt": "9). Give four examples of a minor account?",
+        "prompt": "9). Give four examples of minor accounts?",
         "maxPoints": 4
       },
       {
         "id": "kq10",
         "type": "SHORT",
-        "prompt": "10). What is meant by informal process?",
+        "prompt": "10). What is meant by an informal process?",
         "maxPoints": 2
       },
       {
         "id": "kq11",
         "type": "SHORT",
-        "prompt": "11). What is meant by formal process?",
+        "prompt": "11). What is meant by a formal process?",
         "maxPoints": 2
       },
       {
@@ -138,13 +138,13 @@
       {
         "id": "kq22",
         "type": "LONG",
-        "prompt": "22). List the manner in which one answers a company phone?",
+        "prompt": "22). Describe the proper manner in which one should answer a company phone?",
         "maxPoints": 7
       },
       {
         "id": "kq23",
         "type": "LONG",
-        "prompt": "23). Why is it important for employees to reach/achieve their daily, weekly and monthly target at all times?",
+        "prompt": "23). Why is it important for employees to reach/achieve their daily, weekly and monthly targets at all times?",
         "maxPoints": 6
       },
       {
@@ -156,7 +156,7 @@
       {
         "id": "kq25",
         "type": "LONG",
-        "prompt": "25). Give a clear understanding as to why it is important for companies to process stats monthly?",
+        "prompt": "25). Give a clear understanding as to why it is important for companies to process statistics monthly?",
         "maxPoints": 4
       },
       {
@@ -168,13 +168,13 @@
       {
         "id": "kq27",
         "type": "LONG",
-        "prompt": "27). Explain in your own words why clients/customers stay or leave a company?\n\nA) Why clients/customers STAY (3)\n\nB) Why clients/customers LEAVE (3)",
+        "prompt": "27). Explain in your own words why clients/customers stay or leave a company?\n\nA) Why clients/customers STAY (3 reasons)\n\nB) Why clients/customers LEAVE (3 reasons)",
         "maxPoints": 6
       },
       {
         "id": "kq28",
         "type": "LONG",
-        "prompt": "28). List the four objective handling strategies?",
+        "prompt": "28). List the four objection handling strategies?",
         "maxPoints": 4
       }
     ]
