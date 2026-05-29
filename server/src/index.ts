@@ -101,6 +101,20 @@ app.post('/api/auth/reset-student-login', (req, res) => {
   }
 });
 
+// ─── Teacher: Reset a student's login session by studentId (DELETE) ────────────
+app.delete('/api/auth/student-sessions/:studentId', (req, res) => {
+  const { studentId } = req.params;
+  const sessions = readData<StudentSession[]>(STUDENT_SESSIONS_FILE);
+  const filtered = sessions.filter(s => s.studentId !== studentId);
+
+  if (filtered.length < sessions.length) {
+    writeData(STUDENT_SESSIONS_FILE, filtered);
+    res.json({ success: true, message: `Login session reset for student ${studentId}.` });
+  } else {
+    res.json({ success: true, message: 'No active session found for that student.' });
+  }
+});
+
 // ─── Teacher: Get all student sessions ────────────────────────────────────────
 app.get('/api/auth/student-sessions', (req, res) => {
   const sessions = readData<StudentSession[]>(STUDENT_SESSIONS_FILE);
@@ -244,6 +258,26 @@ app.put('/api/submissions/:id', (req, res) => {
   } else {
     res.status(404).json({ message: 'Submission not found' });
   }
+});
+
+// ─── Teacher: Delete a submission (reset/reroll for a student) ─────────────────
+app.delete('/api/submissions/:id', (req, res) => {
+  const submissions = readData<Submission[]>(SUBMISSIONS_FILE);
+  const index = submissions.findIndex(s => s.id === req.params.id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: 'Submission not found' });
+  }
+
+  const deletedSubmission = submissions[index];
+  submissions.splice(index, 1);
+  writeData(SUBMISSIONS_FILE, submissions);
+
+  res.json({
+    success: true,
+    message: `Submission reset for student ${deletedSubmission.student.name} ${deletedSubmission.student.surname}. They may now retake the exam.`,
+    deleted: deletedSubmission
+  });
 });
 
 // Marking endpoint for teacher

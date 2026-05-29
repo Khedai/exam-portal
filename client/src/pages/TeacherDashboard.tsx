@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import type { Submission, Exam } from '../types.ts';
-import { PlusCircle, Search, LogOut, ChevronRight, BookOpen, Users, ClipboardCheck, Clock } from 'lucide-react';
+import { PlusCircle, Search, LogOut, ChevronRight, BookOpen, Users, ClipboardCheck, Clock, RotateCcw } from 'lucide-react';
 import ToastContainer, { useToast } from '../components/Toast';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -13,6 +13,8 @@ const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'submissions' | 'exams'>('submissions');
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [resetSubmissionTarget, setResetSubmissionTarget] = useState<Submission | null>(null);
+  const [resetLoginTarget, setResetLoginTarget] = useState<string | null>(null);
   const { toasts, showToast } = useToast();
   const navigate = useNavigate();
 
@@ -49,6 +51,33 @@ const TeacherDashboard: React.FC = () => {
     }
   };
 
+  const handleResetSubmission = async () => {
+    if (!resetSubmissionTarget) return;
+    try {
+      await api.deleteSubmission(resetSubmissionTarget.id);
+      const name = `${resetSubmissionTarget.student.name} ${resetSubmissionTarget.student.surname}`;
+      setResetSubmissionTarget(null);
+      showToast(`Submission reset for ${name}. They may now retake the exam.`, 'success');
+      fetchData();
+    } catch (err: any) {
+      setResetSubmissionTarget(null);
+      showToast(err.message || 'Failed to reset submission.', 'error');
+    }
+  };
+
+  const handleResetLogin = async () => {
+    if (!resetLoginTarget) return;
+    try {
+      await api.resetStudentSession(resetLoginTarget);
+      setResetLoginTarget(null);
+      showToast(`Login session reset for student ${resetLoginTarget}. They may now log in again.`, 'success');
+      fetchData();
+    } catch (err: any) {
+      setResetLoginTarget(null);
+      showToast(err.message || 'Failed to reset login session.', 'error');
+    }
+  };
+
   const filteredSubmissions = submissions.filter(sub =>
     `${sub.student.name} ${sub.student.surname} ${sub.student.id}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -68,6 +97,28 @@ const TeacherDashboard: React.FC = () => {
           confirmDanger
           onConfirm={handleDeleteExam}
           onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+
+      {resetSubmissionTarget && (
+        <ConfirmDialog
+          title="Reset Submission"
+          message={`This will delete the submission for ${resetSubmissionTarget.student.name} ${resetSubmissionTarget.student.surname} (ID: ${resetSubmissionTarget.student.id}). They will be able to retake the exam. Are you sure?`}
+          confirmLabel="Reset"
+          confirmDanger
+          onConfirm={handleResetSubmission}
+          onCancel={() => setResetSubmissionTarget(null)}
+        />
+      )}
+
+      {resetLoginTarget && (
+        <ConfirmDialog
+          title="Reset Login Session"
+          message={`This will clear the login session for student ID: ${resetLoginTarget}. They will be able to log in again. Are you sure?`}
+          confirmLabel="Reset Login"
+          confirmDanger
+          onConfirm={handleResetLogin}
+          onCancel={() => setResetLoginTarget(null)}
         />
       )}
 
@@ -221,13 +272,23 @@ const TeacherDashboard: React.FC = () => {
                           ) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          <button
-                            className="btn btn-secondary"
-                            style={{ padding: '6px 12px', fontSize: '12px' }}
-                            onClick={() => navigate(`/teacher/mark/${sub.id}`)}
-                          >
-                            {sub.status === 'MARKED' ? 'View Report' : 'Mark'} <ChevronRight size={13} />
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <button
+                              className="btn btn-secondary"
+                              style={{ padding: '6px 12px', fontSize: '12px' }}
+                              onClick={() => navigate(`/teacher/mark/${sub.id}`)}
+                            >
+                              {sub.status === 'MARKED' ? 'View Report' : 'Mark'} <ChevronRight size={13} />
+                            </button>
+                            <button
+                              className="btn btn-danger"
+                              style={{ padding: '6px 10px', fontSize: '12px' }}
+                              onClick={() => setResetSubmissionTarget(sub)}
+                              title="Reset this submission (student can retake)"
+                            >
+                              <RotateCcw size={13} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

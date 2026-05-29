@@ -87,5 +87,31 @@ export const api = {
       const error = await res.json();
       throw new Error(error.message || 'Failed to delete exam');
     }
+  },
+
+  // ─── Teacher: Reset a submission ──────────────────────────
+  async deleteSubmission(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/submissions/${id}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to reset submission');
+    return data;
+  },
+
+  // ─── Teacher: Reset a student's login session ─────────────
+  async resetStudentSession(studentId: string): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/auth/student-sessions/${studentId}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to reset login session');
+    return data;
+  },
+
+  // ─── Teacher: Get all student login sessions ──────────────
+  async getStudentSessions(): Promise<Array<{ studentId: string; studentName: string; loginTime: string; ipAddress?: string }>> {
+    const res = await fetch(`${API_BASE}/auth/student-sessions`);
+    return res.json();
   }
 };
